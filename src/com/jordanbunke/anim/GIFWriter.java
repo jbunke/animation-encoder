@@ -58,6 +58,11 @@ public class GIFWriter implements AnimWriter {
         write(filepath, images, intervalMillis, 0);
     }
 
+    @Override
+    public String fileSuffix() {
+        return ".gif";
+    }
+
     private static int[][] convertImageToArray(final BufferedImage image) {
         final int[][] colors = new int[image.getHeight()][image.getWidth()];
 

@@ -8,4 +8,6 @@ public interface AnimWriter {
             final Path filepath, final BufferedImage[] images,
             final int intervalMillis
     );
+
+    String fileSuffix();
 }

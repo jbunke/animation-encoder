@@ -2,4 +2,6 @@
 /out/
 /.idea/
 /test_out/
+/test/
+/test_res/
 *.iml
