@@ -1,5 +1,7 @@
-package com.jordanbunke.anim;
+package com.jordanbunke.anim.writers;
 
+import com.jordanbunke.anim.data.AnimFrame;
+import com.jordanbunke.anim.data.Animation;
 import com.squareup.gifencoder.FloydSteinbergDitherer;
 import com.squareup.gifencoder.GifEncoder;
 import com.squareup.gifencoder.ImageOptions;
@@ -10,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-public class GIFWriter implements AnimWriter {
+public final class GIFWriter implements AnimWriter {
     private static final GIFWriter INSTANCE;
 
     static {
@@ -25,37 +27,32 @@ public class GIFWriter implements AnimWriter {
         return INSTANCE;
     }
 
+    @Override
+    public void write(final Path filepath, final Animation animation) {
+        write(filepath, animation, 0);
+    }
+
     public void write(
-            final Path filepath, final BufferedImage[] images,
-            final int intervalMillis, final int repetitions
+            final Path filepath, final Animation animation, final int reps
     ) {
         try (final FileOutputStream outputStream = new FileOutputStream(filepath.toFile())) {
-            if (images.length == 0)
+            if (animation.frames().length == 0)
                 return;
 
-            final int width = images[0].getWidth(), height = images[0].getHeight();
-
             final GifEncoder gifEncoder = new GifEncoder(outputStream,
-                    width, height, repetitions);
+                    animation.width(), animation.height(), reps);
             final ImageOptions options = new ImageOptions()
-                    .setDelay(intervalMillis, TimeUnit.MILLISECONDS)
                     .setDitherer(FloydSteinbergDitherer.INSTANCE);
 
-            for (BufferedImage image : images)
-                gifEncoder.addImage(convertImageToArray(image), options);
+            for (AnimFrame frame : animation.frames()) {
+                options.setDelay(frame.durationMillis(), TimeUnit.MILLISECONDS);
+                gifEncoder.addImage(convertImageToArray(frame.img()), options);
+            }
 
             gifEncoder.finishEncoding();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void write(
-            final Path filepath, final BufferedImage[] images,
-            final int intervalMillis
-    ) {
-        write(filepath, images, intervalMillis, 0);
     }
 
     @Override
