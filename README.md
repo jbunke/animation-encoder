@@ -9,6 +9,6 @@ This is a list of currently supported export formats and their underlying librar
 * **GIF**: [gifencoder](https://github.com/square/gifencoder)
 * **MP4**: [jcodec](https://github.com/jcodec/jcodec)
 
-### Requisite dependency in my other programs
+### External dependency in my other programs
 
 You may be interested in *Animation Encoder* for its use as an external dependency in my other programs. You can download the JAR file needed to compile [*Stipple Effect*](https://github.com/jbunke/stipple-effect) and other programs [here](https://github.com/jbunke/animation-encoder/releases/tag/auxiliary).
