@@ -13,7 +13,7 @@ import java.nio.file.Path;
 public final class GIFWriter implements AnimWriter {
     private static final GIFWriter INSTANCE;
 
-    private static final Color TP_STAND_IN = new Color(0, 255, 0, 0);
+    private static final Color TP_STAND_IN = new Color(0, 255, 0);
 
     static {
         INSTANCE = new GIFWriter();
@@ -32,10 +32,14 @@ public final class GIFWriter implements AnimWriter {
 
         try (final FileOutputStream outputStream = new FileOutputStream(filepath.toFile())) {
             gifEncoder.start(outputStream);
-            gifEncoder.setTransparent(TP_STAND_IN, true);
             gifEncoder.setRepeat(0);
             gifEncoder.setQuality(1);
             gifEncoder.setSize(animation.width(), animation.height());
+
+            for (AnimFrame frame : animation.frames())
+                uniformTransparency(frame.img());
+
+            gifEncoder.setTransparent(TP_STAND_IN);
 
             for (AnimFrame frame : animation.frames()) {
                 uniformTransparency(frame.img());
