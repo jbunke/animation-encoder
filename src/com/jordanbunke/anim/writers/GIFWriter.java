@@ -13,7 +13,7 @@ import java.nio.file.Path;
 public final class GIFWriter implements AnimWriter {
     private static final GIFWriter INSTANCE;
 
-    private static final Color TP_STAND_IN = new Color(0, 255, 0);
+    private static final Color TP_STAND_IN = new Color(0, 254, 0);
 
     static {
         INSTANCE = new GIFWriter();
@@ -36,13 +36,21 @@ public final class GIFWriter implements AnimWriter {
             gifEncoder.setQuality(1);
             gifEncoder.setSize(animation.width(), animation.height());
 
-            for (AnimFrame frame : animation.frames())
-                uniformTransparency(frame.img());
+            boolean hasTransparency = false;
 
-            gifEncoder.setTransparent(TP_STAND_IN);
+            for (int i = 0; i < animation.frames().length &&
+                    !hasTransparency; i++) {
+                final AnimFrame frame = animation.frames()[i];
+                hasTransparency = hasTransparency(frame.img());
+            }
+
+            if (hasTransparency)
+                gifEncoder.setTransparent(TP_STAND_IN);
 
             for (AnimFrame frame : animation.frames()) {
-                uniformTransparency(frame.img());
+                if (hasTransparency)
+                    uniformTransparency(frame.img());
+
                 gifEncoder.setDelay(frame.durationMillis());
                 gifEncoder.addFrame(frame.img());
             }
@@ -64,6 +72,21 @@ public final class GIFWriter implements AnimWriter {
                     img.setRGB(x, y, TP_STAND_IN.getRGB());
             }
         }
+    }
+
+    private static boolean hasTransparency(final BufferedImage img) {
+        final int w = img.getWidth(), h = img.getHeight();
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                final Color px = new Color(img.getRGB(x, y), true);
+
+                if (px.getAlpha() == 0)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
